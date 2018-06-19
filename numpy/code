@@ -1,0 +1,192 @@
+1.创建文件：
+import numpy as np
+world_alcohol = np.genfromtxt("world_alcohol.txt", delimiter = ',', dtype = str)
+#delimiter 是分隔符 利用 dtype 确定创建的数据的类型
+
+2.判断一个矩阵的形状
+a = np.arange(10).reshape((2,5))
+b = a.shape
+>>>(2,5)
+
+3.矩阵里面的数据类型必须是相同的
+
+a = np.array([1,2,3,4.0])
+print(type(a[1]))
+
+<class 'numpy.float64'>
+
+4. 取矩阵的一部分
+b = np.arange(12).reshape(3,4)
+print(b)
+b[:, 0]
+#逗号左边表示所有的行，逗号右边表示index为0的那一列
+#b[0:2, :] 所有列，0，1 行
+
+5.bool值当作索引
+
+vector = np.arange(5,25,5) #从5开始，每次加5，直到25为止（不算25）
+equal_to_ten = (vector == 10)
+print(equal_to_ten)
+print(vector[equal_to_ten])
+>>>[10]
+
+6.
+vector = vector.astype(float)
+#整个向量的所有元素都转化成 float型
+
+7.
+vector.min()
+vector.max()
+
+                                        !!!!!!!!!!!!!!!!!!!!!!!!!!!
+8.要学会多用 shape 和 print(help())函数
+
+9.
+matrix = np.arange(12).reshape(3,4)
+print(matrix)
+a = matrix.sum(axis=1)
+#axis = 1 对行求和，axis = 0  对列求和
+print(a)
+
+  [[ 0  1  2  3]
+  [ 4  5  6  7]
+  [ 8  9 10 11]]
+  [ 6 22 38]
+
+10.
+a.ndim
+#得到矩阵的维度
+#
+matrix = np.arange(12).reshape(3,4)
+print(matrix.ndim)
+>>>2
+
+11.
+a.size
+#矩阵总共的元素数目
+print(matrix.size)
+>>>12
+
+12.
+np.zeros((3,4))
+#shape为(3,4)全为0的矩阵
+
+13.
+np.ones((2,3,4), dtype = np.int32)
+#shape为（2，3，4）的矩阵，里面的元素类型为int32，值都为1
+
+14.
+np.random.random((12,3))
+#random模块下的random函数。其中值的范围是（0，1）然后它的shape是（12，3）
+
+15.
+from numpy import pi
+np.linspace(0, 2*pi, 100)
+创建一个向量，其中有100个元素为等差数列！，起点为0，终点为2*pi。
+
+16.shape相同时，两个矩阵 + - 为对应位置元素做运算,shape不同是不可操作
+当另一个操作数只是一个值时候，所有元素都要对该值做相应运算
+c = np.array([1,2,3])
+c -= 1
+
+17.乘法有点乘和dot
+a*b 等于对应位置元素相乘
+a.dot(b) 矩阵乘法
+np.dot(a,b)
+
+18.幂
+b = np.arange(2)
+c = np.exp(b) #b中所有元素作为指数，e作为底，产生新的矩阵
+d = np.sqrt(b) #对b中所有元素开方
+
+19.
+a = np.floor(10*np.random.random((3,4)))
+#floor即对矩阵的元素向下取整。如3.5 则变成3
+
+20.
+a = np.floor(10*np.random.ranomd((3,4)))
+a.ravel() #将矩阵拉成一个向量
+
+a.shape = (4,3) #改变其形状为（4，3） 效果与 a.reshape(4,3)
+
+a.reshape(3,-1)
+#只指定一个维度为3，另一个维度为-1.计算机会自动计算合适的列的数量
+
+a.T 获得a的转置矩阵
+
+21.矩阵的拼接      ！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+a = np.floor(np.random.random((2,2)))
+b = np.floor(np.random.random((2,2)))
+
+c = np.hstack((a,b))
+#横着拼接  横向增加
+#c.shape为(2,4)
+
+d = np.vstack((a,b))
+#竖着拼接 竖向增加
+#d.shape为(4,2)
+
+22.分割矩阵         ！！！！！！！！！！！！!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+a = np.floor(np.random.random((2,12)))
+
+b = np.hsplit(a,3)
+#将a竖切成3分
+
+c = np.vsplit(a,3)
+#将a横切分成3分
+
+
+23.矩阵的复制
+c = a.view()
+c.shape = (2,6)
+#c改变了形状之后a形状不变，但是c改变值，a对应位置的值同样改变。即，a c 内存不同但是公用一组值
+
+d = a.copy()
+#a的值初始化了d，但是他们不共用内存，也不共用值
+
+24.找出每行（或者列）中最大值的索引
+data = np.sin(np.arange(2)).reshape(5,4)
+print(data)
+
+idx = data.argmax(axis=0) #列
+print(idx)
+
+data_max = data[idx, range(data, shape[1])]
+                行        列
+print(data_max)
+
+>>>
+array([[ 0.        ,  0.84147098,  0.90929743,  0.14112001, -0.7568025 ],
+       [-0.95892427, -0.2794155 ,  0.6569866 ,  0.98935825,  0.41211849],
+       [-0.54402111, -0.99999021, -0.53657292,  0.42016704,  0.99060736],
+       [ 0.65028784, -0.28790332, -0.96139749, -0.75098725,  0.14987721]])
+[3 0 0 1 2]
+[0.65028784 0.84147098 0.90929743 0.98935825 0.99060736]
+
+25.扩展矩阵
+a = np.arange(0, 40, 10)
+
+b = np.tile(a, (3,5))
+       扩展    行3倍 列5倍
+
+26.排序
+a = np.array([[4,3,5],[1,2,1]])
+b = np.sort(a, axis = 1)
+               按什么维度排序
+     a.sort(axis = 1)
+#应用：
+a = np.array([4,3,1,2])
+j = np.argsort(a) # j = a.argsort()
+#j为按从小到大排列的index j = [2,3,1,0]
+
+a[j]
+>>>[1 2 3 4]
+
+#二维矩阵可以这样
+a = np.array([[13, 5, 9, 1],[2, 18, 6, 4]])
+i = np.argsort(a, axis = 0)  #竖着
+j = np.argsort(a, axis = 1)  #横着
+
+#i,j都为index

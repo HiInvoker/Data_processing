@@ -1,0 +1,283 @@
+1.第一个简单的折线图
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+unrate = pd.read_csv('UNRATE.csv') #读取csv文件生成DataFrame文件
+date = unrate['DATE'].values       #将日期数据取出来变成ndarray格式
+value = unrate['VALUE'].values
+fig = plt.figure(figsize = (12,5)) #设定画图的范围
+
+plt.plot(date[0:12], value[0:12])  #将数据的一部分用来画图 分别为x轴和y轴
+plt.xticks(rotation = 45)          #将x轴上的值转向45°
+plt.xlabel('date')                 #在x轴上添加标记
+plt.ylabel('values')               #在y轴上添加标记
+plt.title("Unemployment of 1948")  #给整个图添加一个title
+plt.show()                         #显示整个图
+
+#另一种做法是：先切片在用索引取对应所需数据
+first_twelve = unrate[0:12]
+plt.plot(first_twelve['DATE'], first_twelve['VALUE'])
+plt.show()
+
+2.子图操作
+
+fig = plt.figure(figsize = (12,12))
+ax1 = fig.add_subplot(3,2,1)       #将整个画图区域分成3x2的6个子图，此为第1个
+ax2 = fig.add_subplot(3,2,3)                                           3
+ax3 = fig.add_subplot(3,2,6)
+                                                                                            如果只有两个参数(size可为数字),那么范围为[0, low)，另一个是size
+ax1.plot(np.random.randint(1,5,5), np.arange(5))  #x轴一组数据，y轴一组数据 np.random.randint(low, high, size = ( , ))
+ax2.plot(np.arange(10)*3, np.arange(10))
+
+plt.show()
+
+#将两年的失业率按月份绘制在同一张表上
+unrate['DATE'] = pd.to_datetime(unrate['DATE'])  #将数据转换成时间类型的数据
+
+unrate['MONTH'] = unrate['DATE'].dt.month   #将年月日换成以月为index的数据，在unrate上增加了一列,如果要用.dt，必需用上一步
+
+fig = plt.figure(figsize=(6,3))
+
+plt.plot(unrate[0:12]['MONTH'], unrate[0:12]['VALUE'], c='red')
+plt.plot(unrate[12:24]['MONTH'], unrate[12:24]['VALUE'], c='blue')
+
+plt.show()
+
+#将5年的失业率按月份绘制在同一张表上
+fig = plt.figure(figsize = (12,8))
+colors = ['red', 'blue', 'orange', 'black', 'green']   #年份不同颜色不同
+
+for i in range(5):
+    start_index = i*12
+    end_index = (i+1)*12
+    subset = unrate[start_index : end_index]           #年份不同，index不同
+    label = str(1948+i)
+
+    plt.plot(subset['MONTH'], subset['VALUE'], c = colors[i], label = label )
+
+plt.legend(loc = 'best')    #label放置的位置
+plt.xlabel('Month, Integer')
+plt.ylabel('Unemployment Rate, Percent')
+plt.title('Monthly Unemployment Trends, 1948-1952')
+
+plt.show()
+
+3.画柱状图
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from numpy import arange
+
+reviews = pd.read_csv('fandango_scores.csv')
+cols = ['FILM', 'RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue', 'Fandango_Stars']
+norm_reviews = reviews[cols]
+print(norm_reviews[:1])
+
+#The Axes.bar() method has 2 required parameters, left and height.
+#We use the left parameter to specify the x coordinates of the left sides of the bar.
+#We use the height parameter to specify the height of each bar
+
+num_cols = ['RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue', 'Fandango_Stars']
+
+bar_heights = norm_reviews.ix[0, num_cols].values      #数据类型为nd.array 也可以用norm_reviews[num_cols].loc[0].values 实现
+#print bar_heights
+
+bar_positions = arange(5) + 0.75
+#print bar_positions
+
+fig, ax = plt.subplots()
+ax.bar(bar_positions, bar_heights, 0.5)
+   #柱状图                         #柱宽度
+plt.show()
+
+#增加各种细节：
+
+#By default, matplotlib sets the x-axis tick labels to the integer values the bars
+#spanned on the x-axis (from 0 to 6). We only need tick labels on the x-axis where the bars are positioned.
+#We can use Axes.set_xticks() to change the positions of the ticks to [1, 2, 3, 4, 5]:
+
+num_cols = ['RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue', 'Fandango_Stars']
+bar_heights = norm_reviews.ix[0, num_cols].values
+bar_positions = arange(5) + 0.75
+
+tick_positions = range(1,6)      #num_cols里面数据放置在x轴上的位置
+
+fig, ax = plt.subplots()   #plt.subplots(figsize = ( , ))
+#fig 对画图区域设置， ax为实际图形
+
+ax.bar(bar_positions, bar_heights, 0.5)
+
+ax.set_xticks(tick_positions)                #每一个柱代表的媒体
+ax.set_xticklabels(num_cols, rotation=45)
+
+ax.set_xlabel('Rating Source')
+ax.set_ylabel('Average Rating')
+ax.set_title('Average User Rating For Avengers: Age of Ultron (2015)')
+plt.show()
+
+4.散点图(scatter)
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from numpy import arange
+
+review = pd.read_csv('fandango_scores.csv')
+
+num_cols = ['RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue', 'Fandango_Stars']
+n_review = review[num_cols]
+
+fig, ax = plt.subplots(figsize = (10,6))
+ax.scatter(n_review['Fandango_Ratingvalue'], n_review['RT_user_norm'])
+ax.set_xlabel('Fandango')
+ax.set_ylabel('Rotten Tomatoes')
+plt.show()
+
+#Switching Axes 两个子图，并将他们的坐标轴交换
+
+fig = plt.figure(figsize=(5,10))
+ax1 = fig.add_subplot(2,1,1)
+ax2 = fig.add_subplot(2,1,2)
+
+ax1.scatter(n_review['Fandango_Ratingvalue'], n_review['RT_user_norm'])
+ax1.set_xlabel('Fandango')
+ax1.set_ylabel('Rotten Tomatoes')
+
+ax2.scatter(n_review['RT_user_norm'], n_review['Fandango_Ratingvalue'])
+ax2.set_xlabel('Rotten Tomatoes')
+ax2.set_ylabel('Fandango')
+
+plt.show()
+
+
+5.分布范围图
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+reviews = pd.read_csv('fandango_scores.csv')
+cols = ['FILM', 'RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue']
+norm_reviews = reviews[cols]
+
+print(norm_reviews[:5])
+
+#取得某网站评分计数和排序(数据处理)
+
+fandango_distribution = norm_reviews['Fandango_Ratingvalue'].value_counts()  #评分和出现次数计数
+fandango_distribution = fandango_distribution.sort_index()                   #按计数的大小排序
+
+imdb_distribution = norm_reviews['IMDB_norm'].value_counts()
+imdb_distribution = imdb_distribution.sort_index()
+
+print(fandango_distribution)
+print(imdb_distribution)
+
+fig, ax = plt.subplots()
+ax.hist(norm_reviews['Fandango_Ratingvalue'])
+#ax.hist(norm_reviews['Fandango_Ratingvalue'],bins=20)
+#ax.hist(norm_reviews['Fandango_Ratingvalue'], range=(4, 5),bins=20)
+plt.show()
+
+#取得分布图
+
+fig, ax = plt.subplots()
+ax.hist(norm_reviews['Fandango_Ratingvalue'])
+#ax.hist(norm_reviews['Fandango_Ratingvalue'],bins=20)
+#ax.hist(norm_reviews['Fandango_Ratingvalue'], range=(4, 5),bins=20)
+
+plt.show()
+
+#分布图的子图模式
+
+fig = plt.figure(figsize=(5,20))
+
+ax1 = fig.add_subplot(4,1,1)
+ax2 = fig.add_subplot(4,1,2)
+ax3 = fig.add_subplot(4,1,3)
+ax4 = fig.add_subplot(4,1,4)
+                                                        #x轴刻度范围
+ax1.hist(norm_reviews['Fandango_Ratingvalue'], bins=20, range=(0, 5))
+ax1.set_title('Distribution of Fandango Ratings')
+ax1.set_ylim(0, 50)           #y轴的刻度范围
+
+ax2.hist(norm_reviews['RT_user_norm'], 20, range=(0, 5))
+ax2.set_title('Distribution of Rotten Tomatoes Ratings')
+ax2.set_ylim(0, 50)
+
+ax3.hist(norm_reviews['Metacritic_user_nom'], 20, range=(0, 5))
+ax3.set_title('Distribution of Metacritic Ratings')
+ax3.set_ylim(0, 50)
+
+ax4.hist(norm_reviews['IMDB_norm'], 20, range=(0, 5))
+ax4.set_title('Distribution of IMDB Ratings')
+ax4.set_ylim(0, 50)
+
+plt.show()
+
+6.   盒图（4分图）
+
+num_cols = ['RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue']
+
+fig, ax = plt.subplots()
+
+ax.boxplot(norm_reviews[num_cols].values)  #只需要输入nd.array的数据就可以了
+
+ax.set_xticklabels(num_cols, rotation=90)   #设置x轴刻度上的标签
+ax.set_ylim(0,5)         #y轴的范围
+
+plt.show()
+
+
+7.细节设置
+#Color
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+women_degrees = pd.read_csv('percent-bachelors-degrees-women-usa.csv')
+major_cats = ['Biology', 'Computer Science', 'Engineering', 'Math and Statistics']
+
+
+cb_dark_blue = (0/255, 107/255, 164/255)
+cb_orange = (255/255, 128/255, 14/255)
+
+fig = plt.figure(figsize=(12, 12))
+
+for sp in range(0,4):
+    ax = fig.add_subplot(2,2,sp+1)
+    # The color for each line is assigned here.
+    ax.plot(women_degrees['Year'], women_degrees[major_cats[sp]], c=cb_dark_blue, label='Women')
+    ax.plot(women_degrees['Year'], 100-women_degrees[major_cats[sp]], c=cb_orange, label='Men')
+    for key,spine in ax.spines.items():
+        spine.set_visible(False)
+    ax.set_xlim(1968, 2011)
+    ax.set_ylim(0,100)
+    ax.set_title(major_cats[sp])
+    ax.tick_params(bottom="off", top="off", left="off", right="off")
+
+plt.legend(loc='upper right')
+plt.show()
+
+#Setting Line Width  粗细
+
+cb_dark_blue = (0/255, 107/255, 164/255)
+cb_orange = (255/255, 128/255, 14/255)
+
+fig = plt.figure(figsize=(12, 12))
+
+for sp in range(0,4):
+    ax = fig.add_subplot(2,2,sp+1)
+    # Set the line width when specifying how each line should look.
+    ax.plot(women_degrees['Year'], women_degrees[major_cats[sp]], c=cb_dark_blue, label='Women', linewidth=10)
+    ax.plot(women_degrees['Year'], 100-women_degrees[major_cats[sp]], c=cb_orange, label='Men', linewidth=10)
+    for key,spine in ax.spines.items():
+        spine.set_visible(False)
+    ax.set_xlim(1968, 2011)
+    ax.set_ylim(0,100)
+    ax.set_title(major_cats[sp])
+    ax.tick_params(bottom="off", top="off", left="off", right="off")
+
+plt.legend(loc='upper right')
+plt.show()

@@ -1,0 +1,373 @@
+1.引入库
+import seaborn as sns
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+%matplotlib inline #写出函数即可画出图像
+
+2.利用sns画出6条sin函数图
+
+def sinplot(flip = 1):
+    x = np.linspace(0, 14, 100)
+    for i in range(1,7):
+        plt.plot(x, np.sin(x + i*5) * (7 - i) * flip)
+
+sns.set()      #选择sns的默认格式
+plt.figure(figsize = (8,6))
+sinplot()
+
+3！！！！！！！！！！！！！！！！！5种主题风格
+darkgrid
+whitegrid
+dark
+white
+ticks
+
+sns.set_style("whitegrid")
+#所用风格
+
+
+#使用其中一种风格
+sns.set_style("white")
+sinplot()
+
+data = np.random.normal(size=(20, 6)) + np.arange(6) / 2
+sns.boxplot(data=data)
+#盒图
+
+
+sns.violinplot(data)
+sns.despine(offset=10)
+#图离各坐标的距离
+
+sns.set_style('dark')
+
+sns.set_style("whitegrid")
+sns.boxplot(data=data)
+sns.despine(left=True)
+#去掉边框
+
+with sns.axes_style("darkgrid"):
+    plt.subplot(2, 1, 1)
+    sinplot()
+plt.subplot(2, 1, 2)
+sinplot(-1)
+
+#with语句中的子图使用with语句的设定的模式，之外的就不用该模式
+
+sns.set_context("notebook", font_scale=2, rc={"lines.linewidth": 5})
+                          图中背景的格子大小      图的线条的宽度
+plt.figure(figsize = (20,10))
+sinplot()
+
+
+4.颜色
+
+sns.set(rc = {'figure.figsize': (6,6)})
+#加入了该句之后，默认颜色为6种
+
+调色板
+颜色很重要(也有类似的with用法)
+
+color_palette()能传入任何Matplotlib所支持的颜色
+#     调色板
+color_palette()不写参数则默认颜色
+set_palette()设置所有图的颜色
+
+#默认的调色板（离散画板）:
+current_palette = sns.color_palette()
+sns.palplot(current_palette)
+
+
+#圆形调色板:
+sns.palplot(sns.color_palette('hls', 8))
+                          #默认颜色空间  #传出8中颜色
+
+
+sns.palplot(sns.hls_palette(8, l=.7, s=.9))
+                      #颜色种类数  亮度  饱和度
+
+
+sns.palplot(sns.color_palette("Paired",8))
+                            #两个相关数据对比颜色
+
+
+#连续画板
+
+sns.palplot(sns.color_palette("Blues"))
+
+sns.palplot(sns.color_palette("Blues_r"))
+#颜色后面加上 _r 反转显示颜色的顺序
+
+sns.palplot(sns.color_palette("cubehelix", 8))
+                              #颜色呈线性变化
+
+
+
+x, y = np.random.multivariate_normal([0, 0], [[1, -.5], [-.5, 1]], size=300).T
+pal = sns.dark_palette("green", as_cmap=True)
+                       #同一个颜色，由深到浅，默认由浅到深
+sns.kdeplot(x, y, cmap=pal);
+#等高线
+
+5.单变量与多变量分析绘图
+
+%matplotlib inline
+import numpy as np
+import pandas as pd
+from scipy import stats, integrate
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+sns.set(color_codes=True)
+np.random.seed(sum(map(ord, "distributions")))
+
+x = np.random.normal(size=100)
+sns.distplot(x,kde=False)
+
+#有 kde=False 的时候则没有那条拟合的曲线
+
+#绘制1000个呈高斯分布的数据的直方图
+
+x = np.random.normal(size  = 1000)
+sns.distplot(x)
+
+#数据分布情况
+
+x = np.random.gamma(6, size=200)
+sns.distplot(x, kde=False, fit=stats.gamma)
+                          #用什么去拟合
+
+#根据均值和协方差生成数据
+
+mean, cov = [0, 1], [(1, .5), (.5, 1)]
+data = np.random.multivariate_normal(mean, cov, 200)
+
+df = pd.DataFrame(data, columns=["x", "y"])
+
+df
+
+#观察两个点之间的关系，最好用散点图
+
+sns.jointplot(x = 'x', y = 'y', data = df)
+            #如果后面不传入data 参数df， 前面的x 应为 df['x'], y 为 df['y']
+#也可使用with方法，在数据多的时候使用 六边形 代替
+
+x, y = np.random.multivariate_normal(mean, cov, 1000).T
+with sns.axes_style("white"):
+    sns.jointplot(x=x, y=y, kind="hex", color="k")
+
+
+#观察多种数据之间的关系的时候 pairplot
+
+iris = sns.load_dataset("iris")
+          #导入数据集
+
+sns.pairplot(iris)
+
+正对角线为直方图，因为只有一个参数
+
+
+#回归分析绘图
+
+%matplotlib inline
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+sns.set(color_codes=True)
+
+np.random.seed(sum(map(ord, "regression")))
+
+tips = sns.load_dataset("tips")
+#引入数据集
+tips.head()
+
+#DataFrame
+
+sns.regplot(x="total_bill", y="tip", data=tips)
+#得到一条拟合直线
+
+
+sns.regplot(x="size", y="tip", data=tips, x_jitter=.05)
+#添加一个小的抖动
+
+#多变量分析图
+
+%matplotlib inline
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set(style="whitegrid", color_codes=True)
+
+np.random.seed(sum(map(ord, "categorical")))
+titanic = sns.load_dataset("titanic")
+tips = sns.load_dataset("tips")
+iris = sns.load_dataset("iris")
+
+sns.stripplot(x="day", y="total_bill", data=tips)
+
+#数据存在重叠时需要加点抖动，可以让数据便于观察：
+sns.stripplot(x="day", y="total_bill", data=tips, jitter=True)
+
+sns.swarmplot(x="day", y="total_bill", data=tips)
+
+sns.swarmplot(x="day", y="total_bill", hue="sex",data=tips)
+                                       #表示在哪个数据上进行划分
+
+sns.swarmplot(x="total_bill", y="day", hue="time", data=tips);
+#可以交换坐标轴
+
+#盒图
+IQR即统计学概念四分位距，第一/四分位与第三/四分位之间的距离
+N = 1.5IQR 如果一个值>Q3+N或　<　Ｑ1-N,则为离群点
+
+盒图从下到上为 1/4， 1/2， 3/4
+sns.boxplot(x="day", y="total_bill", hue="time", data=tips)
+
+sns.boxplot(data=iris, orient="h");
+                      #改变盒图的方向
+
+#小提琴图
+
+sns.violinplot(x="total_bill", y="day", hue="time", data=tips)
+
+sns.violinplot(x="day", y="total_bill", hue="sex", data=tips, split=True)
+                                                              #便于观察
+
+#显示集中趋势可以使用条形图
+
+sns.barplot(x= 'sex', y = 'survived', hue = 'class', data = titanic)
+
+#点图可以更好的描述变化差异
+
+sns.piontplot(x= 'sex', y = 'survived', hue = 'class', data = titanic)
+
+#对点图进行进一步的处理（如颜色，标记，线段类型等）
+
+sns.pointplot(x="class", y="survived", hue="sex", data=titanic,
+              palette={"male": "g", "female": "m"},
+              markers=["^", "o"], linestyles=["-", "--"]);
+
+
+6.
+多层面板分类图
+
+sns.factorplot(x="day", y="total_bill", hue="smoker", data=tips)
+
+sns.factorplot(x="day", y="total_bill", hue="smoker", data=tips, kind="bar")
+                                                                #画什么图，就选什么样的kind参数 'swarm'之类的
+sns.factorplot(x="time", y="total_bill", hue="smoker", col="day", data=tips, kind="box", size=4, aspect=.5)
+
+参数：
+x,y,hue 数据集变量 变量名（以该变量做出区别）
+date 数据集 数据集名
+row,col 更多分类变量进行平铺显示 变量名
+col_wrap 每行的最高平铺数 整数
+estimator 在每个分类中进行矢量到标量的映射 矢量
+ci 置信区间 浮点数或None
+n_boot 计算置信区间时使用的引导迭代次数 整数
+units 采样单元的标识符，用于执行多级引导和重复测量设计 数据变量或向量数据
+order, hue_order 对应排序列表 字符串列表
+row_order, col_order 对应排序列表 字符串列表
+kind : 可选：point 默认, bar 柱形图, count 频次, box 箱体, violin 提琴, strip 散点，swarm 分散点
+size 每个面的高度（英寸） 标量 aspect 纵横比 标量 orient 方向 "v"/"h" color 颜色 matplotlib颜色
+palette 调色板 seaborn颜色色板或字典 legend hue的信息面板 True/False legend_out 是否扩展
+图形，并将信息框绘制在中心右边 True/False share{x,y} 共享轴线 True/False
+
+
+
+7.FacetGrid的使用方法
+
+#首先取得数据：
+
+tips = sns.load_dataset("tips")
+tips.head()
+
+#显示
+
+g = sns.FacetGrid(tips, col="time")
+                  #数据   #关系
+g.map(plt.hist, "tip")
+      #图的类型
+
+#增加类型
+
+g = sns.FacetGrid(tips, col="sex", hue="smoker")
+
+g.map(plt.scatter, "total_bill", "tip", alpha=0.7)
+      #图类型         #指标              #透明度
+g.add_legend()
+#说明项（这里是smoker）
+
+g = sns.FacetGrid(tips, row="smoker", col="time", margin_titles=True)
+g.map(sns.regplot, "size", "total_bill", color=".1", fit_reg=False, x_jitter=.1)
+
+#大小，长宽比之类的
+g = sns.FacetGrid(tips, col="day", size=4, aspect=.5)
+g.map(sns.barplot, "sex", "total_bill");
+
+#！！！！！！！！！！！！！！！！！！！！！！！！！！！！输入数据最好用pandas里的，如DataFrame
+
+#改变执行的顺序
+from pandas import Categorical
+ordered_days = tips.day.value_counts().index
+print (ordered_days)
+ordered_days = Categorical(['Thur', 'Fri', 'Sat', 'Sun'])
+g = sns.FacetGrid(tips, row="day", row_order = ordered_days,size=1.7, aspect=4,)
+                                  #  在传入参数
+g.map(sns.boxplot, "total_bill")
+
+#应用调色板
+
+pal = dict(Lunch="seagreen", Dinner="gray")
+            #做一个字典，然后传入到palette里面
+g = sns.FacetGrid(tips, hue="time", palette=pal, size=5)
+g.map(plt.scatter, "total_bill", "tip", s=50, alpha=.7, linewidth=.5, edgecolor="white")
+g.add_legend()
+
+#不同的marker
+g = sns.FacetGrid(tips, hue="sex", palette="Set1", size=5, hue_kws={"marker": ["^", "v"]})
+g.map(plt.scatter, "total_bill", "tip", s=100, linewidth=.5, edgecolor="white")
+g.add_legend()
+
+#应用with来处理
+
+with sns.axes_style("white"):
+    g = sns.FacetGrid(tips, row="sex", col="smoker", margin_titles=True, size=2.5)
+g.map(plt.scatter, "total_bill", "tip", color="#334488", edgecolor="white", lw=.5);
+g.set_axis_labels("Total bill (US Dollars)", "Tip")；
+      #设置x轴的名字
+g.set(xticks=[10, 30, 50], yticks=[2, 6, 10]);
+      #自己设置区间
+g.fig.subplots_adjust(wspace=.02, hspace=.02);
+      #设置子图之间的距离
+#g.fig.subplots_adjust(left  = 0.125,right = 0.5,bottom = 0.1,top = 0.9, wspace=.02, hspace=.02)
+      #整体的偏移程度
+
+#也可以画pairgrid
+
+iris = sns.load_dataset("iris")
+g = sns.PairGrid(iris)
+g.map(plt.scatter);
+
+g = sns.PairGrid(iris)
+g.map_diag(plt.hist)
+#可以指定对角线画什么图
+g.map_offdiag(plt.scatter);
+
+g = sns.PairGrid(iris, vars=["sepal_length", "sepal_width"], hue="species")
+                       #只想取一部分特征来画图
+g.map(plt.scatter);
+
+#渐变色画图
+
+g = sns.PairGrid(tips, hue="size", palette="GnBu_d")
+g.map(plt.scatter, s=50, edgecolor="white")
+g.add_legend();
+
+8.热度图

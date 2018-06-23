@@ -371,3 +371,45 @@ g.map(plt.scatter, s=50, edgecolor="white")
 g.add_legend();
 
 8.热度图
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np;
+np.random.seed(0)
+import seaborn as sns;
+sns.set()
+
+#生成数据
+
+uniform_data = np.random.rand(3, 3)
+print (uniform_data)
+
+heatmap = sns.heatmap(uniform_data)
+#热度图
+
+ax = sns.heatmap(uniform_data, vmin=0.2, vmax=0.5)
+                              #color_bar的取值范围
+
+
+normal_data = np.random.randn(3, 3)
+print (normal_data)
+ax = sns.heatmap(normal_data, center=0)
+                              #以中心值为界
+
+
+flights = sns.load_dataset("flights")
+flights.head()
+
+flights = flights.pivot("month", "year", "passengers")
+                         #以表格给出不同年月的乘客数量
+print (flights)
+ax = sns.heatmap(flights)
+
+ax = sns.heatmap(flights, annot=True,fmt="d")
+                          #在热度图上显示数值，d为格式
+
+ax = sns.heatmap(flights, linewidths=.5)
+                          #带有网格的热度图
+
+ax = sns.heatmap(flights, cmap = 'YlGnBu')
+                          #以渐变色显示热度图

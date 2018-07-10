@@ -36,9 +36,9 @@ print(food.columns)
 print(food.shape)
 
 4.取数据
-#index的用法:
+#iloc只会用行号来选择，loc可用string做索引
 food.loc[0]
-#取出index为0的！一行！的数据
+#取出行号为0的！一行！的数据
 
 #切片
 food.loc[3:6]
@@ -89,7 +89,7 @@ food.sort_values('Sodium_(mg)', inplace = True, ascending = False)
 
 
 8.
-titanic_s = pd.read_csv('titanic_survival.csv')
+titanic_s = pd.read_csv('titanic_train.csv')
 titanic_s.head()
 
 age = titanic_s['Age']
@@ -141,7 +141,7 @@ passenger_survival = titanic_s.pivot_table(index = 'Pclass', values = 'Fare', ag
 print(passenger_survival)
 
 #显示一个量与两个量之间的关系：
-port_stats = titanic_s.pivot_table(index = 'Enbarked', values = ['Fare', 'Survived'], aggfunc = np.sum)
+port_stats = titanic_s.pivot_table(index = 'Embarked', values = ['Fare', 'Survived'], aggfunc = np.sum)
 print(port_stats)
 
 11.缺值处理
@@ -203,7 +203,7 @@ titan_s['age_lable'] = age_labels
 age_group_survival = titan_s.pivot_table(index = 'age_lable', values = 'Survived')
 age_group_survival
 
-15.对电影的评分
+#15.对电影的评分
 fg = pd.read_csv('fandango_score_comparison.csv')
 series_film = fg['FILM']
 print(type(series_film))
@@ -231,7 +231,7 @@ series_custom = Series(rt_score, index = film_names)
 
 #！！！！！！！！！！！！！！！！！！！！！！！！！！！DataFrame <-- Series <-- ndarray
 
-16.排序
+#16.排序
 original_index = series_custom.index.tolist()
 #将series_custom的index（即电影名）转换成列表的形式
 
@@ -247,7 +247,7 @@ sc2 = series_custom.sort_index()
 sc3 = series_custom.sort_values()
 #按照值排序
 
-17.两个Series相加等操作
+#17.两个Series相加等操作
 
 print(np.add(series_custom, series_custom))
 
@@ -256,13 +256,13 @@ np.max(series_custom)
 np.mean(series_custom)
 
 
-1.计算两个机构对同一个电影的平均分
+#18.计算两个机构对同一个电影的平均分
 
 rt_critics = Series(fg['RottenTomatoes'].values, index = fg['FILM'])    #生成新的Series的时候值需要ndarray, index为Series
 rt_users = Series(fg['RottenTomatoes_User'].values, index = fg['FILM'])
 rt_mean = (rt_critics + rt_users) / 2
 
-19.用DataFrame 做索引操作
+#19.用series 做索引操作
 
 fg_films = fg.set_index('FILM', drop = False)
                                 不丢弃原来的
@@ -273,3 +273,20 @@ print(fg_films.index)
 
 fg_films.loc['Avengers: Age of Ultron (2015)' : 'Ant-Man (2015)']
 fg_films['Avengers: Age of Ultron (2015)' : 'Ant-Man (2015)']
+
+#20.
+
+import numpy as np
+
+# returns the data types as a Series
+types = fandango_films.dtypes
+#print types
+# filter data types to just floats, index attributes returns just column names
+float_columns = types[types.values == 'float64'].index
+# use bracket notation to filter columns to just float columns
+float_df = fandango_films[float_columns]
+#print float_df
+# `x` is a Series object representing a column
+deviations = float_df.apply(lambda x: np.std(x))
+                        #利用apply函数将数据标准化
+print(deviations)

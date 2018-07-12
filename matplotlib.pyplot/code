@@ -81,7 +81,7 @@ print(norm_reviews[:1])
 
 num_cols = ['RT_user_norm', 'Metacritic_user_nom', 'IMDB_norm', 'Fandango_Ratingvalue', 'Fandango_Stars']
 
-bar_heights = norm_reviews.ix[0, num_cols].values      #数据类型为nd.array 也可以用norm_reviews[num_cols].loc[0].values 实现
+bar_heights = norm_reviews.loc[0, num_cols].values      #数据类型为nd.array 也可以用norm_reviews[num_cols].loc[0].values 实现
 #print bar_heights
 
 bar_positions = arange(5) + 0.75
@@ -200,7 +200,7 @@ ax4 = fig.add_subplot(4,1,4)
                                                         #x轴刻度范围
 ax1.hist(norm_reviews['Fandango_Ratingvalue'], bins=20, range=(0, 5))
 ax1.set_title('Distribution of Fandango Ratings')
-ax1.set_ylim(0, 50)           #y轴的刻度范围
+ax1.set_ylim(0, 50)  #y轴的刻度范围
 
 ax2.hist(norm_reviews['RT_user_norm'], 20, range=(0, 5))
 ax2.set_title('Distribution of Rotten Tomatoes Ratings')

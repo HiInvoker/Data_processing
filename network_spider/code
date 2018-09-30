@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import requests as r
+from bs4 import BeautifulSoup as bs
+import json
+
+#输入url然后获取HTML新闻的各种内容
+def getInfo(url):
+    result = {}
+    res = r.get(url)
+    res.encoding = 'utf-8'
+    soup = bs(res.text, 'html.parser')
+    result['title'] = soup.select('.main-title')[0].text
+    result['link'] = soup.select('.date-source a')[0]['href']
+    result['source'] = soup.select('.date-source a')[0].text
+    result['date'] = soup.select(".date")[0].text
+    result['index'] = result['link'].split('/')[-1].rstrip('.html')
+    article = soup.select('#article p')
+    a = []
+    for i in article:
+        a.append(i.text.strip())
+    result['article'] = ''.join(a)
+    result['author'] = a[-1].strip('责任编辑：')
+    return result
+
+#输入新闻的id然后获取JS的新闻的热评
+def getHotCmnt(newsid):
+    commurl = 'http://comment5.news.sina.com.cn/page/info?version=1&format=js&channel=gn&newsid=comos-{}&group=0&compress=0&ie=gbk&oe=gbk&page=1&page_size=20&jsvar=loader_1538287994541_27361247'.format(newsid)
+    jres = r.get(commurl)
+    jres.encoding = 'utf-8'
+    jres.text
+    jres = json.loads(jres.text.lstrip('var loader_1538287994541_27361247='))
+    count = ('count', jres['result']['count']['total'])
+    cmntlist = jres['result']['cmntlist']
+    cmntlist = [(i['nick'], i['content']) for i in cmntlist]
+    return count, cmntlist
+
+
+#输入新闻列表的url然后返回新闻的title的url
+def getNewsListInfo(newslisturl):
+    res = r.get(newslisturl)
+    res.encoding = 'utf-8'
+    res = json.loads(res.text.strip('var loader_1538287994541_15052199='))
+    hotnewslist = []
+    for i in res['result']['hotnews']:
+        new = {'newsid': i['newsid'].lstrip('comos-'), 'title' : i['title'], 'url' :  i['url']}
+        hotnewslist.append(new)
+    return hotnewslist
+
+if '__name__' == "__main__":
+    newslisturl = 'http://comment5.news.sina.com.cn/hotnews/info?format=js&channel=gn&hotid=gn_day&jsvar=loader_1538287994541_15052199'
+    

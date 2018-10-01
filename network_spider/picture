@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+#任务目标，从国家地理下载动物图片 url = "http://www.nationalgeographic.com.cn/animals/"
+
+import requests as r
+from bs4 import BeautifulSoup as bs
+import json
+
+res = r.get(url)
+res.encoding = 'utf-8'
+soup = bs(res.text, 'html.parser')
+soup
+
+list = soup.select('.img_list')
+#list是一个list of list 的结构 ：2*3的结构
+
+for i in list:
+    rs = i.find_all('img')
+    for j in rs:
+        url = j['src']         #取得img属性（照片的链接）
+        rs = r.get(url, stream = True)  #按批次连续下载
+        i_name = url.split('/')[-1]
+        with open('./img/{}'.format(i_name), 'wb') as f:
+            for chunk in rs.iter_content(chunk_size = 128):
+                f.write(chunk)
+        print("loaded {}".format(i_name))
